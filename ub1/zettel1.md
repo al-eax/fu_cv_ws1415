@@ -29,6 +29,7 @@ def getSubImg(img, x, y, width, height):
 img = Image.open("image.jpg")
 subimg = getSubImg(img, 50,100,60,60)
 subimg.show()
+subimg.save("aufg12.png")
 ```
 ![](aufg12.png)
 
@@ -36,7 +37,7 @@ subimg.show()
 ```python
 from PIL import Image
 
-def getChanel(img,channel):
+def getChannel(img,channel):
 	img = img.convert("RGB")
 	subimage = Image.new("RGB", img.size)
 	for x in range(img.size[0]):
@@ -54,8 +55,9 @@ def getChanel(img,channel):
 	return subimage
 
 img = Image.open("image.jpg")
-channel = getChanel(img, "R")
+channel = getChannel(img, "R")
 channel.show()
+channel.save("aufg13.png");
 ```
 ![](aufg13.png)
 
@@ -75,9 +77,9 @@ def mirror(img,axis):
 	return newImg
 
 img = Image.open("image.jpg")
-channel = mirror(img, "x")
-channel.show()
-
+m = mirror(img, "x")
+m.show()
+m.save("aufg14.png")
 ```
 ![](aufg14.png)
 
@@ -91,20 +93,21 @@ def rgb2gray(img):
 		for y in range(height -1):
 			r,g,b = img.load()[x,y]
 			g = int(0.2989 * r + 0.5870 * g + 0.1140 * b)
-			img.load()[x,y] = (g,g,g)
+			img.load()[x,y] = (255-g,255-g,255-g)
 
 img = Image.open('image.jpg')
 rgb2gray(img)
-#img = Image.open('image.jpg').convert('LA') PIL only
+#img = Image.open('image.jpg').convert('LA')
 img.show()
+img.save("aufg15.png")
 ```
 ![](aufg15.png)
 
 ## Aufgabe 2: Human vs. Computer Vision
-|  | Auge | Kamera |
-|--|------|--------|
+| - | Auge | Kamera |
+|---|------|--------|
 | Fokussierung  | durch Streckung der Linse      |  durch Abstand von Objektiv      |
-| Dimension | durch 2 Augen, 3D Bild | durch eine Line, 2D |
+| Dimension | durch 2 Augen, 3D Bild | durch ein Objektiv, 2D |
 | blinder Punkt | vorhanden, dort wo Sehnerven zusammenlaufen | nicht vorhanden |
 
 ## Aufgabe 3: das invertierte After-Image

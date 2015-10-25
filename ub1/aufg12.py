@@ -1,5 +1,3 @@
-#this solution uses pil lib
-
 from PIL import Image
 
 def getSubImg(img, x, y, width, height):
@@ -12,3 +10,4 @@ def getSubImg(img, x, y, width, height):
 img = Image.open("image.jpg")
 subimg = getSubImg(img, 50,100,60,60)
 subimg.show()
+subimg.save("aufg12.png")

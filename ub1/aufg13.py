@@ -1,8 +1,6 @@
-#this solution uses pil lib
-
 from PIL import Image
 
-def getChanel(img,channel):
+def getChannel(img,channel):
 	img = img.convert("RGB")
 	subimage = Image.new("RGB", img.size)
 	for x in range(img.size[0]):
@@ -21,6 +19,6 @@ def getChanel(img,channel):
 	
 
 img = Image.open("image.jpg")
-channel = getChanel(img, "R")
+channel = getChannel(img, "R")
 channel.show()
-
+channel.save("aufg13.png");

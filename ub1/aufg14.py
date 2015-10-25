@@ -1,5 +1,3 @@
-#this solution uses pil lib
-
 from PIL import Image
 
 def mirror(img,axis):
@@ -14,6 +12,6 @@ def mirror(img,axis):
 	return newImg
 
 img = Image.open("image.jpg")
-channel = mirror(img, "x")
-channel.show()
-
+m = mirror(img, "x")
+m.show()
+m.save("aufg14.png")
