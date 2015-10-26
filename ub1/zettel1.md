@@ -111,3 +111,4 @@ img.save("aufg15.png")
 | blinder Punkt | vorhanden, dort wo Sehnerven zusammenlaufen | nicht vorhanden |
 
 ## Aufgabe 3: das invertierte After-Image
+Unverändertes, langes Betrachten führt zur Ermüdung der beanspuchten Fotorezeptoren. Batrachtet man anschließend eine weiße Fläche, bleiben Signale der ermüdeten Fotorezeptoren aus. Das Gehirn überinterpretiert die ankommenden Signale und erstellt ein Komplementärbild.
