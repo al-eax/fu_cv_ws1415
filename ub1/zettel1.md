@@ -106,7 +106,8 @@ img.save("aufg15.png")
 ## Aufgabe 2: Human vs. Computer Vision
 | - | Auge | Kamera |
 |---|------|--------|
-| Fokussierung  | durch Streckung der Linse      |  durch Abstand von Objektiv      |
+| Fokussierung 1  | durch Streckung der Linse      |  durch Abstand von Objektiv      |
+| Fokussierung 2 |  Fokus auf Punkt | Fokus auf alle Punkt mit gleichem Abstand |
 | Dimension | durch 2 Augen, 3D Bild | durch ein Objektiv, 2D |
 | blinder Punkt | vorhanden, dort wo Sehnerven zusammenlaufen | nicht vorhanden |
 
