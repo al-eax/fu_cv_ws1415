@@ -97,7 +97,6 @@ def rgb2gray(img):
 
 img = Image.open('image.jpg')
 rgb2gray(img)
-#img = Image.open('image.jpg').convert('LA')
 img.show()
 img.save("aufg15.png")
 ```

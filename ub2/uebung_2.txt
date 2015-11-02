@@ -1,0 +1,23 @@
+Aufgabe 1: Kamerasensoren (2 Punkte)
+
+Nimm einen Fotoapparat (Handy, Webcam, ...) und nimm ein Foto von einer Szene mit (1) translatorischer und (2) rotatorischer Bewegung auf. Variiere dabei (i) die Lage des Bildsensors und (ii) die Belichtungsintensität.
+
+    Zeige Beispielbilder für verschiedene Effekte die durch die Bewegung entstehen und benenne sie. (Abgabe 1.1)
+    Welchen Bildsensor hast Du vermutlich benutzt? Begründe (kurz)! 
+
+Aufgabe 2: Pinhole-Kamera-Projektion (4 Punkte)
+
+Im Anhang zur Aufgabe findest Du eine Reihe von Weltpunkten im Kamerakoordinatensystem.
+
+    Implementiere das Pinhole-Kameramodell und projiziere die Weltpunkte auf Deinen virtuellen Bildsensor (Abgabe 2.1)
+    Verringere nun die Brennweite um die Hälfte. Projiziere erneut und überlagere die neue und alte Projektion (Abgabe 2.2).
+    Verändere Deinen Code für die Parallelprojektion und nutze diese, um die Weltpunkte erneut auf den Sensor zu projizieren (Abgabe 2.3).
+
+Aufgabe 3:Bayer-2-Color (4 Punkte)
+
+Im Anhang zur Aufgabe findest Du eine Bildmatrix, die das rohe Bayer-Format aufweist. Die Breite des Bildes ist übrigens 1282 Pixel.
+
+    Stelle ein Unterbild dar von (350, 180) bis (440, 260). (Abgabe 3.1)
+    Implementiere eine Funktion zur Erstellung eines Farbbildes aus den Rohdaten (Abgabe 3.2)
+    Welche Farbe hat der Stift rechts unten?
+
