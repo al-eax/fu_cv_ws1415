@@ -21,3 +21,9 @@
 ![](img4parallel.png)
 
 ## 3. Aufgabe - Bayer-2-Color
+![](rawimg.png)
+### 3.1 - Subimage
+![](subrawimg.png)
+### 3.2 - Konvertiert
+__Der Stift hat die Farbe rot.__
+![](colorimg.png)

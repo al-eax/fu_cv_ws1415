@@ -126,9 +126,12 @@ def raw2img(mat):
 
 raw = csv2mat("image_bayer_raw.csv")
 
-print len(raw[0])
+rawimg = raw2img(raw)
+rawimg.save("rawimg.png")
 
 subraw = getSubMat(raw,350, 180, 440 - 350, 260 - 180)
-#rawimg = raw2img(subraw)
-rawimg = raw2color(raw)
-rawimg.save("imgfoo.png")
+subrawimg = raw2img(subraw)
+subrawimg.save("subrawimg.png")
+
+color = raw2color(raw)
+color.save("colorimg.png")
