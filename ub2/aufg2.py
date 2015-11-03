@@ -31,6 +31,9 @@ def w2cPinhole(point, f):
 	x = factor * point[0]
 	return (x,y)
 
+def w2cParallel(point, zoom):
+	return (point[0]*zoom,point[1]*zoom)
+
 #calculate bounding box
 def getBB(points):
 	minx = points[0][0]
@@ -60,7 +63,9 @@ def coords2img(screenCoords,rgb):
 	for (px,py) in screenCoords:
 		pixel = (int(px - minx ), int(py - miny))
 		pixels[pixel] = rgb
-	return img	
+	return img
+
+
 ############ 1. img
 #read 3d points from csv
 points = csv2points("pointdata_3d.csv")
@@ -83,9 +88,16 @@ img2 = coords2img(screenCoords, (0,255,0))
 img2.save("img2_f" + str(f) + ".png")
 
 
-######## 3. img
+########## 3. img
 f = f*2.0
 for point in points:
 	screenCoords.append(w2cPinhole(point,f))
 img3 = coords2img(screenCoords, (0,0,255))
 img3.save("img3_f" + str(f) + ".png")
+
+######## parallel projection
+screenCoords = []
+for point in points:
+	screenCoords.append(w2cParallel(point,100))
+img4 = coords2img(screenCoords, (0,0,255))
+img4.save("img4parallel.png")
