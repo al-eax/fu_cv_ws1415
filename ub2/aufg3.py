@@ -33,7 +33,7 @@ def getMergedColorFromRaw(raw, (rawx, rawy)):
     lmid = (rawx - 1, rawy)
     lbot = (rawx - 1, rawy -1)
 
-    mtop = (rawx , rawy +1)
+    mtop = (rawx , rawy + 1)
     mmid = (rawx , rawy )
     mbot = (rawx , rawy -1)
 
@@ -102,7 +102,7 @@ def getMergedColorFromRaw(raw, (rawx, rawy)):
             b = get(raw, lmid) + get(raw, rmid)
             b /= 2
 
-    return (r,g,b)
+    return (b,g,r)
 
 def raw2color(rawmat):
     imgSize = (len(rawmat[0]) / 3 , len(rawmat) / 3)
