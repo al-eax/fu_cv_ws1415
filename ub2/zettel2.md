@@ -5,6 +5,12 @@
 * __eMail:__ hinze.alex@gmail.com
 
 ## 1. Aufgabe - Kamerasensoren
+__Rotation__
+![](rotation.jpg)
+__Translation__
+![](translation.jpg)
+
+
 
 ## 2. Aufgabe - Pinhole-Kamera-Projektion
 
@@ -25,5 +31,5 @@
 ### 3.1 - Subimage
 ![](subrawimg.png)
 ### 3.2 - Konvertiert
-__Der Stift hat die Farbe rot.__
+__Der Stift ist rot.__
 ![](colorimg.png)
