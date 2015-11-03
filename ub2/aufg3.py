@@ -109,20 +109,30 @@ def raw2color(rawmat):
     img = Image.new( 'RGB',imgSize , "white")
     for x in range(imgSize[0]):
         for y in range(imgSize[1]):
-            rawx = x*3 + 1
-            rawy = y*3 + 1
-
+            rawx = x * 3 + 1
+            rawy = y * 3 + 1
             color = getMergedColorFromRaw(rawmat, (rawx, rawy))
             img.load()[x,y] = color
     return img
 
 def raw2img(mat):
-    imgSize = (len(mat[0]), len(mat))
-    img = Image.new( 'RGB',imgSize , "black")
-    for x in range(imgSize[0]):
-        for y in range(imgSize[1]):
-            img.load()[x,y] = mat[y][x]
-    return img
+	imgSize = (len(mat[0]), len(mat))
+	img = Image.new( 'RGB',imgSize , "black")
+	r = g = b = 0
+	for x in range(imgSize[0]):
+		for y in range(imgSize[1]):
+			if x % 2 == 0:
+				if y % 2 == 0:
+					g = raw[y][x]
+				else:
+					b = raw[y][x]
+			else:
+				if y % 2 == 0:
+					r = raw[y][x]
+				else:
+					g = raw[y][x]
+			img.load()[x,y] = (b,g,r)
+	return img
 
 raw = csv2mat("image_bayer_raw.csv")
 
