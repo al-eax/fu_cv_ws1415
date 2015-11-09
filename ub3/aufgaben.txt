@@ -1,0 +1,14 @@
+Übung 3
+Aufgabe 1: Farbräume (4 Punkte)
+
+    lade das angehängte Bild "racecar.png"
+    konvertiere das Bild in den HSV-Farbraum
+    stelle das Histogramm über dem Hue-Kanal für das gesamte Bild (Abgabe 1.1) und für den Ausschnitt (x,y) = (460, 260) bis (660, 360) (Abgabe 1.2)
+    Bitte beachten: In Matlab wird zuerst die Zeile referenziert, also die Y-Koordinate.
+
+Aufgabe 2: CAMSHIFT (Teil 1) (6 Punkte
+
+    lies das paper: http://opencv.jp/opencv-1.0.0_org/docs/papers/camshift.pdf
+    implementiere eine Methode, die Dir - gegeben ein Hue-Histogramm - die Objekt-Wahrscheinlichkeitsverteilung für ein neues Bild berechnet (1)
+    wähle aus dem angehängten Video "racecar.avi" ein Einzelbild (2)
+    wende (1) für das Objekthistogramm aus Abgabe 1.2 auf (2) an und stelle das Ergebniss dar (Abgabe 2.1)
