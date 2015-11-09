@@ -1,4 +1,4 @@
-# Zettel 1 - Computer Vision ws15/16
+# Zettel 2 - Computer Vision ws15/16
 
 * __Name:__ Alexander Hinze-Hüttl
 * __Matrikel Nr.:__ 4578322
@@ -31,5 +31,5 @@ __Translation__
 ### 3.1 - Subimage
 ![](subrawimg.png)
 ### 3.2 - Konvertiert
-__Der Stift ist rot.__
+__Der Stift ist rot.__ (glaube ich, hab eine Rot-Grün-Schwäche)
 ![](colorimg.png)
