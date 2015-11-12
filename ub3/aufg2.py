@@ -1,5 +1,6 @@
 from PIL import Image
 import numpy, cv2
+import colorsys
 
 def rgb2hsv(rgb):
     (R,G,B) = rgb
@@ -7,29 +8,7 @@ def rgb2hsv(rgb):
     R = float(R / 255.0)
     G = float(G / 255.0)
     B = float(B / 255.0)
-
-    MIN = min(R,G,B)
-    MAX = max(R,G,B)
-
-
-    if MIN == MAX:
-        H = 0
-    elif MAX == R:
-        H = 60.0 * (G - B) / (MAX - MIN)
-    elif MAX == G:
-        H = 60.0 * (2.0 + (B - R) / (MAX - MIN))
-    elif MAX == B:
-        H = 60.0 * (4.0 + (R - G) / (MAX - MIN))
-    if H < 0.0:
-        H += 360.0
-
-    if MAX == 0:
-        S = 0
-    else:
-        S = (MAX - MIN)/MAX
-    V = MAX
-    return (H,S,V)
-
+    return colorsys.rgb_to_hsv(R,G,B)
 def hsvhist(img):
     resut = []
     d = {}
@@ -39,19 +18,13 @@ def hsvhist(img):
     for x in range(img.size[0]):
         for y in range(img.size[1]):
             (H,S,V) = rgb2hsv(i[x,y])
-            H = int(H)
+            H = int(H*100)
             if H in d:
                 d[H] += 1
             else:
                 d[H] = 1
     return d
 
-def getImgMoment(img, i,j):
-	s = 0
-	for x in range(img.size[0]):
-		for y in range(img.size[1]):
-			s += x**i * y**j * img.load()[x,y]
-	return s
 
 # convert opencv video frame to pil image
 def cv2pil(frame):
@@ -71,7 +44,7 @@ def getFrame(file, n):
 
 def getImgProb(hist, img):
 	result = []
-	totalSum = 0
+	totalSum = 0.0
 	for value in hist.values():
 		totalSum += value
 
@@ -79,12 +52,12 @@ def getImgProb(hist, img):
 		line = []
 		for y in range(img.size[1]):
 			(H,S,V) = rgb2hsv(img.load()[x,y])
-			H = int(H)
+			H = int(H*100)
 			pixelProp = 0.0
 			if H in hist:
 				pixelProp = float(hist[H]) / float(totalSum)
 			else:
-				#print "fuck " + str(H)
+				##print "fuck " + str(H)
 				pass
 			line.append(pixelProp)
 		result.append(line)
@@ -102,18 +75,12 @@ def imgProb2Gray(prob):
 			img.load()[y,x] = val
 	return img
 
-'''
-1. get 2. frame from video
-2. convert frame to image
-3. read subimage
-4. get hue histogramm from subimage
-5. get probability matrix from image by historamm from subimage
-6. convert matrix to gray scale image
-'''
-
 file = "racecar.avi"
-frame = getFrame(file, 30)
+framenumber = 1
+frame = getFrame(file,framenumber )
 img = cv2pil(frame)
+
+img.save("frame" + str(framenumber) + ".png")
 
 subimg = Image.open("sub.png").convert("RGB")
 

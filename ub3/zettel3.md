@@ -13,3 +13,7 @@ __Teilbild:__
  ![](sub.png)
 
  ![](subhist.png)
+
+### 2. Aufgabe - CAMSHIFT
+
+ ![](probimg.png)
