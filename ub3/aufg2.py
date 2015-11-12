@@ -61,8 +61,8 @@ def cv2pil(frame):
 
 def getFrame(file, n):
 	frame = 0
+	cam = cv2.VideoCapture(file)
 	for i in range(n):
-		cam = cv2.VideoCapture(file)
 		if cam.grab():
 			flag, frame = cam.retrieve()
 	return frame
@@ -103,19 +103,19 @@ def imgProb2Gray(prob):
 	return img
 
 '''
-1. get 100. frame from video
+1. get 2. frame from video
 2. convert frame to image
 3. read subimage
 4. get hue histogramm from subimage
-5. get object probability from image by histogramm from subimage
-6. convert probability
+5. get probability matrix from image by historamm from subimage
+6. convert matrix to gray scale image
 '''
 
 file = "racecar.avi"
-frame = getFrame(file, 2)
+frame = getFrame(file, 30)
 img = cv2pil(frame)
 
-subimg = Image.open("subsub.png").convert("RGB")
+subimg = Image.open("sub.png").convert("RGB")
 
 subgimgHist = hsvhist(subimg)
 
@@ -123,3 +123,4 @@ prob = getImgProb(subgimgHist, img)
 
 probimg = imgProb2Gray(prob)
 probimg.show()
+probimg.save("probimg.png")
