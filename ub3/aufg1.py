@@ -41,8 +41,8 @@ def hsvhist(img):
     resut = []
     d = {}
     i = img.load()
-    result = Image.new("RGB", img.size)
-    o = result.load()
+    #result = Image.new("RGB", img.size)
+    #o = result.load()
     for x in range(img.size[0]):
         for y in range(img.size[1]):
             (H,S,V) = rgb2hsv(i[x,y])
@@ -68,7 +68,7 @@ def saveHist(hist,filename):
     plt.xlabel("Hue")
     plt.plot(range(minKey,maxKey + 1),line)
     plt.savefig(filename)
-    plt.show()
+#    plt.show()
 
 
 #print rgb2hsv((72, 79, 102))
