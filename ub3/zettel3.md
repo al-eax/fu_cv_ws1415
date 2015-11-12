@@ -17,3 +17,5 @@ __Teilbild:__
 ### 2. Aufgabe - CAMSHIFT
 Frame 100
  ![](probimg.png)
+
+Je nach Runding der Hue Werte, kommen hellere Bilder zustande.
