@@ -18,7 +18,7 @@ def hsvhist(img):
     for x in range(img.size[0]):
         for y in range(img.size[1]):
             (H,S,V) = rgb2hsv(i[x,y])
-            H = int(H*100)
+            H = int(round(H,3)*100)
             if H in d:
                 d[H] += 1
             else:
@@ -52,7 +52,7 @@ def getImgProb(hist, img):
 		line = []
 		for y in range(img.size[1]):
 			(H,S,V) = rgb2hsv(img.load()[x,y])
-			H = int(H*100)
+			H = int(round(H,3)*100)
 			pixelProp = 0.0
 			if H in hist:
 				pixelProp = float(hist[H]) / float(totalSum)
@@ -76,7 +76,7 @@ def imgProb2Gray(prob):
 	return img
 
 file = "racecar.avi"
-framenumber = 1
+framenumber = 100 
 frame = getFrame(file,framenumber )
 img = cv2pil(frame)
 
