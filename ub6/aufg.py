@@ -33,14 +33,16 @@ def readVideoFrames(path = "beedance.avi", frames = -1):
     return result
 
 def sobel(img):
-    x= cv2.Sobel(img,cv2.CV_8UC1,1, 0, 3)
-    y= cv2.Sobel(img,cv2.CV_8UC1,0, 1, 3)
+    x= cv2.Sobel(img,cv2.CV_8U,1, 0, 3)
+    y= cv2.Sobel(img,cv2.CV_8U,0, 1, 3)
     return (x,y)
 
 def getH(frame1, frame2, point):
     (px,py) = point
-    F = frame1[ py - 3 : py + 2 , px - 3 : px + 2] #
-    G = frame2[ py - 3 : py + 2 , px - 3 : px + 2]
+    F = frame1[ py - 7 : py + 8 , px - 7 : px + 8] #
+    G = frame2[ py - 7 : py + 8 , px - 7 : px + 8]
+    #print len(F)
+    #print len(F[0])
     (FDx,FDy) = sobel(F)
     FDsum = (0,0) # x,y
     Dot = 0
@@ -51,12 +53,12 @@ def getH(frame1, frame2, point):
             fdx = int(FDx[y,x])# F'(x)
             fdy = int(FDy[y,x])# F'(x)
             v = int(G[y,x]) - int(F[y,x]) # F(x) - G(x)
-            FDsum = (FDsum[0] +  fdx * v ,FDsum[1] +  fdy * v ) #Sum[ F'(x) * G(x) - F(x) ]
+            FDsum = (FDsum[0] + fdx * v ,FDsum[1] +  fdy * v ) #Sum[ F'(x) * G(x) - F(x) ]
             Dot += (fdx * fdx) + (fdy * fdy) #Sum[F'(x) * F'(x)]
     if(Dot == 0):
         return (0,0)
     h = (float(FDsum[0]) / float(Dot) , float(FDsum[1]) / float(Dot) )
-    print h
+    #print h
     #fx = F[py,px] + (h[0]*FDx[1] + h[1] * FDx[0])
     return  h
 
@@ -64,15 +66,27 @@ def getH(frame1, frame2, point):
 corners = readCSV()
 frames = readVideoFrames()#(frames = 10)
 
-output = np.zeros((len(frames[0][1]),len(frames[0][0]),1), np.uint8)
+
+frame4 = frames[0].copy()
+output = np.zeros((len(frames[0][1]),len(frames[0][0]),3), np.uint8)
+output[:,:] = 255
+
 for i in range(len(frames) -1):
     frame1 = frames[i]
     frame2 = frames[i+1]
     for c in range(len(corners)):
         corner = corners[c]
         h = getH(frame1, frame2, corner) #x,y
-        predicted = (int(corner[0] + h[1]),int(corner[1] + h[0])) #y,x
+        predicted = (int(corner[0] + h[1]),int(corner[1] + h[0])) #x,y
+        #if(predicted != corner):
+            #print str(corner) + "   -> " + str(predicted)
         #print str(corner) + " - " + str(predicted) + " - " + str(h)
-        cv2.line(output, corner, predicted, (255), 1)
+        cv2.circle(frame1,corner,3,255,2)
+        cv2.line(frame4, corner, predicted, (255,0,0), 1)
+        cv2.line(output, corner, predicted,0 , 1)
         corners[c] = predicted
-imShow(output)
+    #imShow(frame1)
+
+
+imShow(frame4,"LK")
+imShow(output,"LK - BW")
