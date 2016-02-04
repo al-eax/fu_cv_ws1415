@@ -98,25 +98,28 @@ def getKeyPoints(doglist):
                             add = False
                 if(add == True):
                     keypoints.append(((start_x + 1 ,start_y + 1 ),middlVal))
-                    #print middlVal
-                    #print d1
-                    #print d2
-                    #print d3
-                    #print "------------"
+
         listOfKeypoints.append(keypoints)
     return listOfKeypoints
 
-def drawKeypoints(img, keypoints,radius = 1):
-    for i in range(len(keypoints)):
+def drawKeypoints(IMG, keypoints,radius = 1):
+    img = IMG.copy()
+    octaves = len(keypoints)
+    for i in range(octaves):
         for kp in keypoints[i]:
             ((x,y),val) = kp
             center = (x*(2**i) ,y*(2**i))
-            print center
-            cv2.circle(img,center ,(len(keypoints)-i)*2 , 255)
+            #print center
+            cv2.circle(img,center ,(i+1)*5 , 255)
+    return img
 
 def deriveImg(img):
-    imX = cv2.Sobel(img,cv2.CV_64F,1,0,ksize=3) #or cv2.CV_64F ?
-    imY = cv2.Sobel(img,cv2.CV_64F,0,1,ksize=3) #or cv2.CV_64F ?
+    #imX = cv2.Sobel(img,cv2.CV_64F,1,0,ksize=3) #or cv2.CV_64F ?
+    #imY = cv2.Sobel(img,cv2.CV_64F,0,1,ksize=3) #or cv2.CV_64F ?
+    imX = cv2.filter2D(img,-1,np.array([ [1.0 , -1.0], [ 1.0 , -1.0]  ]))
+    imY = cv2.filter2D(img,-1,np.array([ [1.0, 1.0], [-1.0, -1.0]  ]))
+    #imX = cv2.filter2D(img,-1,np.array([ [1.0, -1.0]  ]))
+    #imY = cv2.filter2D(img,-1,np.array([ [-1.0], [1.0]  ]))
     return (imX,imY)
 
 def reject(keypoints, dogs, r = 10.0):
@@ -134,18 +137,41 @@ def reject(keypoints, dogs, r = 10.0):
         #print str(len(kps)) + " Keypoints before rejection"
         for kp in kps:
             ((x,y),value) = kp
-            if(dx[y][x] < 0.03 and dy[y][x] < 0.03):
+            if(abs(dx[y][x]) < 0.03 and abs(dy[y][x]) < 0.03): #|D(x^)| > 0.03 ?
                 continue
             TrH = float(dxx[y][x]) + float(dyy[y][x])
             DetH = float(dxx[y][x]) * float(dyy[y][x]) - float(dxy[y][x])**2
             if(DetH == 0):
                 continue
-            if( (TrH**2 / DetH) < ((r+1)/r) ):# < or > ?
+            if( (TrH**2 / DetH) < ((r+1)**2/r) ):# < or > ?
                 newDogKeypoints.append(kp)
         newKeypoints.append(newDogKeypoints)
         #print str(len(newDogKeypoints)) + " Keypoints after rejection"
         #print "---------"
     return newKeypoints
+
+
+
+def getOrientations(keypoints,gaussians):
+    for octave in range(len(keypoints)):
+        Scales = gaussians[octave]
+        KPs = keypoints[octave]
+        L = Scales[0]
+        #imShow(L.astype(np.uint8))
+        s = int((octave+1)*1.5) #windowsize for neighbors
+        print s
+        for kp in KPs:
+            ((x,y),v) = kp
+            neighbors = L[y-s:y+s,x-s:x+s]
+            if(len(neighbors) == 0):
+                continue
+            print str(len(neighbors)) + "x" + str(len(neighbors[0]))
+            #TODO get histogramm
+
+def magnitudeOrientation(L,x,y):
+    m = math.sqrt( (L[y][x+1] - L[y][x-1])**2 + (L[y+1][x] - L[y-1][x]  )**2)
+    t = math.atan( (L[y+1][x] - L[y-1][x])/(L[y][x+1] - L[y][x-1]))
+    return (m,t)
 
 img = cv2.imread("Lenna.png")#cv2.imread("Lenna.png") #read image
 img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) #convert to gray
@@ -156,5 +182,9 @@ img = np.float64(img) #convert to float
 keypoints = getKeyPoints(dogs)
 
 keypoints = reject(keypoints,dogs)
-drawKeypoints(o1,keypoints)
-imShow(o1)
+orientations = getOrientations(keypoints,gaussians)
+o1 = drawKeypoints(o1,keypoints)
+
+#imShow(o1)
+#imShow(gaussians[0][0].astype(np.uint8))
+#cv2.imwrite("foo.png" , dogs[0][0].astype(np.uint8))
