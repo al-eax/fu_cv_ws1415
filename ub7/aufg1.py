@@ -71,6 +71,7 @@ def getKeyPoints(doglist):
         keypoints = []
         for start_y in range(len(dogs[0]) - 3):
             for start_x in range(len(dogs[0][0]) - 3):
+                # 3x3x3 Cube around keypoint
                 d1 = dogs[0][start_y : start_y +3 ,start_x : start_x + 3 ]
                 d2 = dogs[1][start_y : start_y +3 ,start_x : start_x + 3 ]
                 d3 = dogs[2][start_y : start_y +3 ,start_x : start_x + 3 ]
@@ -102,6 +103,12 @@ def getKeyPoints(doglist):
         listOfKeypoints.append(keypoints)
     return listOfKeypoints
 
+def drawArrow(img,coords,angle,lenght):
+    angle = angle * math.pi/180
+    (x,y) = coords
+    newCoords = (x + int(lenght * math.cos(angle)),y + int(lenght * math.sin(angle)))
+    cv2.line(img, coords , newCoords, 255)
+
 def drawKeypoints(IMG, keypoints,radius = 1):
     img = IMG.copy()
     octaves = len(keypoints)
@@ -111,16 +118,20 @@ def drawKeypoints(IMG, keypoints,radius = 1):
             center = (x*(2**i) ,y*(2**i))
             #print center
             cv2.circle(img,center ,(i+1)*5 , 255)
+            drawArrow(img,center,val , (i+1)*10)
     return img
 
 def deriveImg(img):
-    #imX = cv2.Sobel(img,cv2.CV_64F,1,0,ksize=3) #or cv2.CV_64F ?
-    #imY = cv2.Sobel(img,cv2.CV_64F,0,1,ksize=3) #or cv2.CV_64F ?
-    imX = cv2.filter2D(img,-1,np.array([ [1.0 , -1.0], [ 1.0 , -1.0]  ]))
-    imY = cv2.filter2D(img,-1,np.array([ [1.0, 1.0], [-1.0, -1.0]  ]))
+    imX = cv2.Sobel(img,cv2.CV_64F,1,0,ksize=3) #or cv2.CV_64F ?
+    imY = cv2.Sobel(img,cv2.CV_64F,0,1,ksize=3) #or cv2.CV_64F ?
+    #imX = cv2.filter2D(img,-1,np.array([ [1.0 , -1.0], [ 1.0 , -1.0]  ]))
+    #imY = cv2.filter2D(img,-1,np.array([ [1.0, 1.0], [-1.0, -1.0]  ]))
     #imX = cv2.filter2D(img,-1,np.array([ [1.0, -1.0]  ]))
     #imY = cv2.filter2D(img,-1,np.array([ [-1.0], [1.0]  ]))
     return (imX,imY)
+
+def dist(A,B):
+    return math.sqrt((A[0] - B[0])**2 + (A[1] - B[1])**2)
 
 def reject(keypoints, dogs, r = 10.0):
     newKeypoints = []
@@ -137,8 +148,16 @@ def reject(keypoints, dogs, r = 10.0):
         #print str(len(kps)) + " Keypoints before rejection"
         for kp in kps:
             ((x,y),value) = kp
-            if(abs(dx[y][x]) < 0.03 and abs(dy[y][x]) < 0.03): #|D(x^)| > 0.03 ?
-                continue
+
+            '''
+            tx = d2[y][x] + x*dx[y][x]
+            ty =  d2[y][x] + y*dy[y][x]
+            print str((x,y)) + str((tx,ty))
+            if(dist((x,y),(tx,ty)) > 0.5):
+               x = tx
+               y = ty
+            '''
+
             TrH = float(dxx[y][x]) + float(dyy[y][x])
             DetH = float(dxx[y][x]) * float(dyy[y][x]) - float(dxy[y][x])**2
             if(DetH == 0):
@@ -150,28 +169,47 @@ def reject(keypoints, dogs, r = 10.0):
         #print "---------"
     return newKeypoints
 
+def magnitudeOrientation(L,x,y):
+    m = math.sqrt( (L[y][x+1] - L[y][x-1])**2 + (L[y+1][x] - L[y-1][x]  )**2)
+    t = math.atan( (L[y+1][x] - L[y-1][x])/(L[y][x+1] - L[y][x-1]))
+    return (m,t)
 
+def getOridntation(L,s,_x,_y):
+    hist = np.zeros(36)
+    for y in range(_y - s, _y + s):
+        for x in range(_x - s, _x + s):
+            (m,t) = magnitudeOrientation(L,x,y)
+            if (m == 0):
+                continue
+            t *= 180/math.pi #rad to deg
+            t = t % 360 #negative angles to 0-360
+            if(t > 90 and t < 200):
+                print t
+            t = t//10 #break down to 10 bins
+            hist[t-1] += m
+    #print hist
+    (_, _, _, (_,maxAngle)) = cv2.minMaxLoc(hist)
+    #print maxAngle
+    return (maxAngle+1)*10
 
 def getOrientations(keypoints,gaussians):
+    newKeypoints = []
     for octave in range(len(keypoints)):
+        nKps = []
         Scales = gaussians[octave]
         KPs = keypoints[octave]
         L = Scales[0]
         #imShow(L.astype(np.uint8))
         s = int((octave+1)*1.5) #windowsize for neighbors
-        print s
         for kp in KPs:
             ((x,y),v) = kp
-            neighbors = L[y-s:y+s,x-s:x+s]
-            if(len(neighbors) == 0):
-                continue
-            print str(len(neighbors)) + "x" + str(len(neighbors[0]))
-            #TODO get histogramm
+            #if neighbors are in picture
+            if(y-s > 0 and x-s > 0 and y+s <len(L) and x+s <len(L[0]) ):
+                ori = getOridntation(L,s,x,y)
+                nKps.append(((x,y), ori ))
+        newKeypoints.append(nKps)
+    return newKeypoints
 
-def magnitudeOrientation(L,x,y):
-    m = math.sqrt( (L[y][x+1] - L[y][x-1])**2 + (L[y+1][x] - L[y-1][x]  )**2)
-    t = math.atan( (L[y+1][x] - L[y-1][x])/(L[y][x+1] - L[y][x-1]))
-    return (m,t)
 
 img = cv2.imread("Lenna.png")#cv2.imread("Lenna.png") #read image
 img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) #convert to gray
@@ -182,9 +220,8 @@ img = np.float64(img) #convert to float
 keypoints = getKeyPoints(dogs)
 
 keypoints = reject(keypoints,dogs)
-orientations = getOrientations(keypoints,gaussians)
-o1 = drawKeypoints(o1,keypoints)
-
-#imShow(o1)
+orientedKeypoints = getOrientations(keypoints,gaussians)
+o1 = drawKeypoints(o1,orientedKeypoints)
+imShow(o1)
 #imShow(gaussians[0][0].astype(np.uint8))
 #cv2.imwrite("foo.png" , dogs[0][0].astype(np.uint8))
