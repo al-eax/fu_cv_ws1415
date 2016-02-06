@@ -4,6 +4,9 @@
 * __Matrikel Nr.:__ 4578322
 * __eMail:__ hinze.alex@gmail.com
 
+
+__Ergebnisse variieren start in Anhängigkeit von verwendeten Kerneln und deren Größe ab.__
+
 # Aufgabe 1: Scale Space (4 Punkte)
 * __unterste und oberste Schicht der DoG-Pyramide__
 
@@ -13,7 +16,6 @@
 
 # Aufgabe 2: Keypoint-Detektion und Aussieben (4 Punkte)
 
-Ergebnisse variieren start in Anhängigkeit von verwendeten Kerneln.
 
 * __Vor Rejection: 766 Keypoints:__
 
