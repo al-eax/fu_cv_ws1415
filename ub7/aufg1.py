@@ -122,8 +122,8 @@ def drawKeypoints(IMG, keypoints,radius = 1):
     return img
 
 def deriveImg(img):
-    imX = cv2.Sobel(img,cv2.CV_64F,1,0,ksize=3) #or cv2.CV_64F ?
-    imY = cv2.Sobel(img,cv2.CV_64F,0,1,ksize=3) #or cv2.CV_64F ?
+    #imX = cv2.Sobel(img,cv2.CV_64F,1,0,ksize=3) #or cv2.CV_64F ?
+    #imY = cv2.Sobel(img,cv2.CV_64F,0,1,ksize=3) #or cv2.CV_64F ?
     #imX = cv2.filter2D(img,-1,np.array([ [1.0 , -1.0], [ 1.0 , -1.0]  ]))
     #imY = cv2.filter2D(img,-1,np.array([ [1.0, 1.0], [-1.0, -1.0]  ]))
     #imX = cv2.filter2D(img,-1,np.array([ [1.0, -1.0]  ]))
@@ -149,14 +149,13 @@ def reject(keypoints, dogs, r = 10.0):
         for kp in kps:
             ((x,y),value) = kp
 
-            '''
-            tx = d2[y][x] + x*dx[y][x]
-            ty =  d2[y][x] + y*dy[y][x]
-            print str((x,y)) + str((tx,ty))
-            if(dist((x,y),(tx,ty)) > 0.5):
-               x = tx
-               y = ty
-            '''
+            #f(x+h) = f(x) + h*f'(x)
+            #taylor
+            tx = d2[y][x] + 1*dx[y][x]
+            ty = d2[y][x] + 1*dy[y][x]
+            #print str(d2[y][x]) + str((tx,ty))
+            if (abs(d2[y][x] - tx) < 0.03 and abs(d2[y][x] - ty) < 0.03 ):
+                continue
 
             TrH = float(dxx[y][x]) + float(dyy[y][x])
             DetH = float(dxx[y][x]) * float(dyy[y][x]) - float(dxy[y][x])**2
@@ -170,21 +169,29 @@ def reject(keypoints, dogs, r = 10.0):
     return newKeypoints
 
 def magnitudeOrientation(L,x,y):
+    (Lx,Ly) = deriveImg(L)
     m = math.sqrt( (L[y][x+1] - L[y][x-1])**2 + (L[y+1][x] - L[y-1][x]  )**2)
-    t = math.atan( (L[y+1][x] - L[y-1][x])/(L[y][x+1] - L[y][x-1]))
+    #t = math.atan( (L[y+1][x] - L[y-1][x]) / (L[y][x+1] - L[y][x-1]) )
+    t = math.atan2( Lx[y][x] , Ly[y][x] )
     return (m,t)
 
 def getOridntation(L,s,_x,_y):
+    #L = deriveImg(L)[1]
     hist = np.zeros(36)
     for y in range(_y - s, _y + s):
         for x in range(_x - s, _x + s):
             (m,t) = magnitudeOrientation(L,x,y)
             if (m == 0):
                 continue
+
+            #if(abs(t*180/math.pi) > 100):
+            #    pass
+            #print str(t) + "->" + str(t*180/math.pi)
             t *= 180/math.pi #rad to deg
+
             t = t % 360 #negative angles to 0-360
-            if(t > 90 and t < 200):
-                print t
+
+
             t = t//10 #break down to 10 bins
             hist[t-1] += m
     #print hist
@@ -211,7 +218,7 @@ def getOrientations(keypoints,gaussians):
     return newKeypoints
 
 
-img = cv2.imread("Lenna.png")#cv2.imread("Lenna.png") #read image
+img = cv2.imread("Lenna_transformed.png")#cv2.imread("Lenna.png") #read image
 img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) #convert to gray
 o1 = img.copy()
 img = np.float64(img) #convert to float

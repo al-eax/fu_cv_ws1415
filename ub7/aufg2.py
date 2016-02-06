@@ -78,5 +78,5 @@ img1 = cv2.imread("Lenna.png",0)
 img2 = cv2.imread("Lenna_transformed.png",0)
 
 matches = match(l_desc[0:100],lt_desc[0:100])
-matches = filter(matches)[0:10]
+matches = filter(matches)[0:40]
 drawKeypoints(img1,img2,l_locs,lt_locs,matches)
