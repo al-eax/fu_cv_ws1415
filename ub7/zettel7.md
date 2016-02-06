@@ -5,7 +5,7 @@
 * __eMail:__ hinze.alex@gmail.com
 
 
-__Ergebnisse variieren start in Anhängigkeit von verwendeten Kerneln und deren Größe ab.__
+__Ergebnisse variieren stark in Anhängigkeit von verwendeten Kerneln und deren Größe ab.__
 
 # Aufgabe 1: Scale Space (4 Punkte)
 * __unterste und oberste Schicht der DoG-Pyramide__
