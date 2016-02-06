@@ -25,7 +25,7 @@ def getGaussians(img,currentOctave , scales = 4):
     sigma = 1.6
     for i in range(scales):
         #TODO beginne mit anderem Sigma !!!!!
-        k = pow(math.sqrt(2),i)
+        k = pow(math.sqrt(2),i + currentOctave)
         #k = (i+1) * math.sqrt(2)
         blur = img.copy()
         cv2.GaussianBlur(src=img,dst = blur,ksize=kernelSize,sigmaX=sigma*k,sigmaY=sigma,borderType = cv2.BORDER_DEFAULT )
@@ -37,6 +37,8 @@ def getDOG(gaussians):
     for i in range(len(gaussians) -1):
         d = gaussians[i+1] - gaussians[i]
         result.append(d)
+    #imShow(result[0])
+    #imShow(result[len(result)-1])
     return result
 
 def showGaussians(gaus):
@@ -103,11 +105,30 @@ def getKeyPoints(doglist):
         listOfKeypoints.append(keypoints)
     return listOfKeypoints
 
+def draw_arrow(image, p, q, color, arrow_magnitude=9, thickness=1, line_type=8, shift=0):
+    # adapted from http://mlikihazar.blogspot.com.au/2013/02/draw-arrow-opencv.html
+    #SOURCE http://mlikihazar.blogspot.de/2013/02/draw-arrow-opencv.html
+    # draw arrow tail
+    cv2.line(image, p, q, color, thickness, line_type, shift)
+    # calc angle of the arrow
+    angle = np.arctan2(p[1]-q[1], p[0]-q[0])
+    # starting point of first line of arrow head
+    p = (int(q[0] + arrow_magnitude * np.cos(angle + np.pi/4)),
+    int(q[1] + arrow_magnitude * np.sin(angle + np.pi/4)))
+    # draw first half of arrow head
+    cv2.line(image, p, q, color, thickness, line_type, shift)
+    # starting point of second line of arrow head
+    p = (int(q[0] + arrow_magnitude * np.cos(angle - np.pi/4)),
+    int(q[1] + arrow_magnitude * np.sin(angle - np.pi/4)))
+    # draw second half of arrow head
+    cv2.line(image, p, q, color, thickness, line_type, shift)
+
 def drawArrow(img,coords,angle,lenght):
     angle = angle * math.pi/180
     (x,y) = coords
     newCoords = (x + int(lenght * math.cos(angle)),y + int(lenght * math.sin(angle)))
-    cv2.line(img, coords , newCoords, 255)
+    draw_arrow(img,coords,newCoords,255)
+    #cv2.line(img, coords , newCoords, 255)
 
 def drawKeypoints(IMG, keypoints,radius = 1):
     img = IMG.copy()
@@ -117,13 +138,13 @@ def drawKeypoints(IMG, keypoints,radius = 1):
             ((x,y),val) = kp
             center = (x*(2**i) ,y*(2**i))
             #print center
-            cv2.circle(img,center ,(i+1)*5 , 255)
+            cv2.circle(img,center , int( 1.6* pow(math.sqrt(2),i )  ) * 5 , 255)
             drawArrow(img,center,val , (i+1)*10)
     return img
 
 def deriveImg(img):
-    #imX = cv2.Sobel(img,cv2.CV_64F,1,0,ksize=3) #or cv2.CV_64F ?
-    #imY = cv2.Sobel(img,cv2.CV_64F,0,1,ksize=3) #or cv2.CV_64F ?
+    imX = cv2.Sobel(img,cv2.CV_64F,1,0,ksize=3) #or cv2.CV_64F ?
+    imY = cv2.Sobel(img,cv2.CV_64F,0,1,ksize=3) #or cv2.CV_64F ?
     #imX = cv2.filter2D(img,-1,np.array([ [1.0 , -1.0], [ 1.0 , -1.0]  ]))
     #imY = cv2.filter2D(img,-1,np.array([ [1.0, 1.0], [-1.0, -1.0]  ]))
     #imX = cv2.filter2D(img,-1,np.array([ [1.0, -1.0]  ]))
@@ -154,8 +175,9 @@ def reject(keypoints, dogs, r = 10.0):
             tx = d2[y][x] + 1*dx[y][x]
             ty = d2[y][x] + 1*dy[y][x]
             #print str(d2[y][x]) + str((tx,ty))
-            if (abs(d2[y][x] - tx) < 0.03 and abs(d2[y][x] - ty) < 0.03 ):
+            if (abs(d2[y][x] - tx) < 0.03 or abs(d2[y][x] - ty) < 0.03 ):
                 continue
+
 
             TrH = float(dxx[y][x]) + float(dyy[y][x])
             DetH = float(dxx[y][x]) * float(dyy[y][x]) - float(dxy[y][x])**2
@@ -171,8 +193,11 @@ def reject(keypoints, dogs, r = 10.0):
 def magnitudeOrientation(L,x,y):
     (Lx,Ly) = deriveImg(L)
     m = math.sqrt( (L[y][x+1] - L[y][x-1])**2 + (L[y+1][x] - L[y-1][x]  )**2)
-    #t = math.atan( (L[y+1][x] - L[y-1][x]) / (L[y][x+1] - L[y][x-1]) )
+    #t = math.atan( (L[y+1][x] - L[y-1][x]) / (L[y][x+1] - L[y][x-1])  )
+    #print t, (L[y+1][x] - L[y-1][x]) / (L[y][x+1] - L[y][x-1]) , t*180/math.pi
+
     t = math.atan2( Lx[y][x] , Ly[y][x] )
+
     return (m,t)
 
 def getOridntation(L,s,_x,_y):
@@ -190,6 +215,8 @@ def getOridntation(L,s,_x,_y):
             t *= 180/math.pi #rad to deg
 
             t = t % 360 #negative angles to 0-360
+            #if (t > 100 and t < 230):
+            #    print t
 
 
             t = t//10 #break down to 10 bins
@@ -207,7 +234,7 @@ def getOrientations(keypoints,gaussians):
         KPs = keypoints[octave]
         L = Scales[0]
         #imShow(L.astype(np.uint8))
-        s = int((octave+1)*1.5) #windowsize for neighbors
+        s = int((octave+1)*2.5) #windowsize for neighbors
         for kp in KPs:
             ((x,y),v) = kp
             #if neighbors are in picture
@@ -218,7 +245,7 @@ def getOrientations(keypoints,gaussians):
     return newKeypoints
 
 
-img = cv2.imread("Lenna_transformed.png")#cv2.imread("Lenna.png") #read image
+img = cv2.imread("Lenna.png")#cv2.imread("Lenna.png") #read image
 img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) #convert to gray
 o1 = img.copy()
 img = np.float64(img) #convert to float
@@ -226,9 +253,12 @@ img = np.float64(img) #convert to float
 (gaussians,dogs) = getDOGLaplacePyramid(img)
 keypoints = getKeyPoints(dogs)
 
+print len(keypoints[0]) + len(keypoints[1]) + len(keypoints[2]) + len(keypoints[3])
 keypoints = reject(keypoints,dogs)
+print len(keypoints[0]) + len(keypoints[1]) + len(keypoints[2]) + len(keypoints[3])
 orientedKeypoints = getOrientations(keypoints,gaussians)
+#o1 = drawKeypoints(o1,orientedKeypoints)
 o1 = drawKeypoints(o1,orientedKeypoints)
 imShow(o1)
-#imShow(gaussians[0][0].astype(np.uint8))
+
 #cv2.imwrite("foo.png" , dogs[0][0].astype(np.uint8))

@@ -77,6 +77,6 @@ lt_desc = readCSV("desc_Lenna_transformed.csv")
 img1 = cv2.imread("Lenna.png",0)
 img2 = cv2.imread("Lenna_transformed.png",0)
 
-matches = match(l_desc[0:100],lt_desc[0:100])
-matches = filter(matches)[0:40]
+matches = match(l_desc,lt_desc)
+#matches = filter(matches)[0:15]
 drawKeypoints(img1,img2,l_locs,lt_locs,matches)
