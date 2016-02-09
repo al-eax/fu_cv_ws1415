@@ -28,7 +28,7 @@ def getGaussians(img,currentOctave , scales = 4):
         k = pow(math.sqrt(2),i + currentOctave)
         #k = (i+1) * math.sqrt(2)
         blur = img.copy()
-        cv2.GaussianBlur(src=img,dst = blur,ksize=kernelSize,sigmaX=sigma*k,sigmaY=sigma,borderType = cv2.BORDER_DEFAULT )
+        cv2.GaussianBlur(src=img,dst = blur,ksize=kernelSize,sigmaX=sigma*k,sigmaY=sigma*k,borderType = cv2.BORDER_DEFAULT )
         result.append(blur)
     return result
 
@@ -130,7 +130,7 @@ def drawArrow(img,coords,angle,lenght):
     draw_arrow(img,coords,newCoords,255)
     #cv2.line(img, coords , newCoords, 255)
 
-def drawKeypoints(IMG, keypoints,radius = 1):
+def drawKeypoints(IMG, keypoints,drawArrows = False):
     img = IMG.copy()
     octaves = len(keypoints)
     for i in range(octaves):
@@ -139,7 +139,8 @@ def drawKeypoints(IMG, keypoints,radius = 1):
             center = (x*(2**i) ,y*(2**i))
             #print center
             cv2.circle(img,center , int( 1.6* pow(math.sqrt(2),i )  ) * 5 , 255)
-            drawArrow(img,center,val , (i+1)*10)
+            if (drawArrows):
+                drawArrow(img,center,val , (i+1)*10)
     return img
 
 def deriveImg(img):
@@ -196,8 +197,8 @@ def magnitudeOrientation(L,x,y):
     #t = math.atan( (L[y+1][x] - L[y-1][x]) / (L[y][x+1] - L[y][x-1])  )
     #print t, (L[y+1][x] - L[y-1][x]) / (L[y][x+1] - L[y][x-1]) , t*180/math.pi
 
-    t = math.atan2( Lx[y][x] , Ly[y][x] )
-
+    #t = math.atan2( Lx[y][x] , Ly[y][x] )
+    t = math.atan2(L[y+1][x] - L[y-1][x] , L[y][x+1] - L[y][x-1])
     return (m,t)
 
 def getOridntation(L,s,_x,_y):
@@ -253,12 +254,17 @@ img = np.float64(img) #convert to float
 (gaussians,dogs) = getDOGLaplacePyramid(img)
 keypoints = getKeyPoints(dogs)
 
+imShow(dogs[0][0], "first DOG")
+imShow(dogs[3][2], "last DOG")
+
+imShow(drawKeypoints(o1,keypoints,False), "all Keypoints")
 print len(keypoints[0]) + len(keypoints[1]) + len(keypoints[2]) + len(keypoints[3])
-keypoints = reject(keypoints,dogs)
+keypoints = reject(keypoints,dogs,r=10)
+imShow(drawKeypoints(o1,keypoints,False), "rejected Keypoints")
 print len(keypoints[0]) + len(keypoints[1]) + len(keypoints[2]) + len(keypoints[3])
 orientedKeypoints = getOrientations(keypoints,gaussians)
 #o1 = drawKeypoints(o1,orientedKeypoints)
-o1 = drawKeypoints(o1,orientedKeypoints)
-imShow(o1)
+o1 = drawKeypoints(o1,orientedKeypoints, True)
+imShow(o1, "detected Keypoints")
 
 #cv2.imwrite("foo.png" , dogs[0][0].astype(np.uint8))
